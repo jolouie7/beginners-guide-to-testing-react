@@ -6,15 +6,19 @@ import { MemoryRouter } from 'react-router-dom';
 
 // TODO: use test.each https://jestjs.io/docs/en/api#testeachtablename-fn-timeout to DRY up code for how it works and about links.
 
+function setup() {
+  return render(
+    <MemoryRouter>
+      <App />
+    </MemoryRouter>
+  );
+}
+
 describe("Header", () => {
   test('how it works: link points to the correct page', () => {
     console.log(name)
     //During tests we wrap the App inside a MemoryRouter
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+    setup();
     // getByRole should be your go-to query.
     // we are getting a link but there are multiple links, so we have to specify a name option with a regex value
     const link = screen.getByRole("link", { name: /how it works/i })
@@ -27,11 +31,7 @@ describe("Header", () => {
 
   test('about: link points to the correct page', () => {
     console.log(name)
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+    setup();
     const link = screen.getByRole("link", { name: /about/i })
     // screen.debug(link);
     userEvent.click(link);
@@ -41,11 +41,7 @@ describe("Header", () => {
   });
 
   test('"Logo": link points to the correct page', () => {
-    render(
-      <MemoryRouter>
-        <App />
-      </MemoryRouter>
-    );
+    setup();
     const link = screen.getByRole("link", { name: /logo.svg/i })
     // screen.debug(link);
     userEvent.click(link);
@@ -53,5 +49,28 @@ describe("Header", () => {
       screen.getByRole("button", { name: /search/i })
     ).toBeInTheDocument();
   })
-  
 });
+
+// 1.The user enters a value in the form's input and submits.
+// 2.The app shows a loading message while it's waiting for the data.
+// 3.When the response arrives the data is rendered.
+describe("Subreddit form", () => {
+  test('loads posts that are rendered on the page', async () => {
+    setup();
+    // get the input field and change the input value
+    const subredditInput = screen.getByLabelText("r /");
+    userEvent.type(subredditInput, "reactjs");
+
+    // get the button and click it
+    const submitButton = screen.getByRole("button", { name: /search/i })
+    userEvent.click(submitButton);
+    expect(
+      screen.getByText(/is loading/i)
+    ).toBeInTheDocument();
+
+    // When the response arrives the data is rendered
+    const numberOfTopPosts = await screen.findByText(/number of top posts:/i);
+
+    screen.debug(numberOfTopPosts)
+  })
+})
