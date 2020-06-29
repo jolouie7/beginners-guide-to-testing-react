@@ -76,7 +76,8 @@ describe("Subreddit form", () => {
     expect(
       await screen.findByText(/number of top posts: 25/i)
     ).toBeInTheDocument();
+    expect(fetch).toHaveBeenCalledWith("https://www.reddit.com/r/reactjs/top.json");
 
-    screen.debug(numberOfTopPosts)
+    // screen.debug(numberOfTopPosts)
   })
 })
