@@ -3,6 +3,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from "@testing-library/user-event";
 import App from './App';
 import { MemoryRouter } from 'react-router-dom';
+import mockResponse from "./__mocks__/subreddit-reactjs-response.json";
+import fetchMock from "jest-fetch-mock";
+
+fetchMock.enableMocks();
 
 // TODO: use test.each https://jestjs.io/docs/en/api#testeachtablename-fn-timeout to DRY up code for how it works and about links.
 
@@ -16,7 +20,6 @@ function setup() {
 
 describe("Header", () => {
   test('how it works: link points to the correct page', () => {
-    console.log(name)
     //During tests we wrap the App inside a MemoryRouter
     setup();
     // getByRole should be your go-to query.
@@ -30,7 +33,6 @@ describe("Header", () => {
   });
 
   test('about: link points to the correct page', () => {
-    console.log(name)
     setup();
     const link = screen.getByRole("link", { name: /about/i })
     // screen.debug(link);
@@ -56,6 +58,7 @@ describe("Header", () => {
 // 3.When the response arrives the data is rendered.
 describe("Subreddit form", () => {
   test('loads posts that are rendered on the page', async () => {
+    fetch.once(JSON.stringify(mockResponse));
     setup();
     // get the input field and change the input value
     const subredditInput = screen.getByLabelText("r /");
@@ -70,6 +73,9 @@ describe("Subreddit form", () => {
 
     // When the response arrives the data is rendered
     const numberOfTopPosts = await screen.findByText(/number of top posts:/i);
+    expect(
+      await screen.findByText(/number of top posts: 25/i)
+    ).toBeInTheDocument();
 
     screen.debug(numberOfTopPosts)
   })
